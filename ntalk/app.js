@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var load = require('express-load');
-//var error = require('./middleware/error');
+//var error = require('./middleware/error');  // comentado pois estava sempre caindo na pagina 404
 var cookieParser = require('cookie-parser')
 var session = require('cookie-session')
 var bodyParser = require('body-parser')
@@ -20,8 +20,8 @@ app.use(bodyParser());
 app.use(methodOverride('X-HTTP-Method-Override'));
 //app.use(app.router); //deprecetad no more necessary
 app.use(express.static(__dirname + '/public'));
-//app.use(error.notFound);
-//app.use(error.serverError);
+//app.use(error.notFound); // comentado pois estava sempre caindo na pagina 404
+//app.use(error.serverError); // comentado pois estava sempre caindo na pagina 404
 
 //app.get('/', routes.index);
 //app.get('/usuarios', routes.user.index);
