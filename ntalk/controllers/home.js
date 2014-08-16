@@ -9,6 +9,7 @@ module.exports = function(app){
 
 			if(email && nome){
 				var usuario = req.body.usuario;
+				usuario['contatos'] = []; // CRIA UM ARRAY DE CONTATOS VAZIO
 				req.session.usuario = usuario;
 				res.redirect('/contatos');
 			}else{
