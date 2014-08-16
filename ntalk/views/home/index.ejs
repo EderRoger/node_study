@@ -1,25 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Ntalk - Agenda de contatos</title>
-</head>
-<body>
+<% include ../header %>
 <header>
-<h1>Ntalk</h1>
-<h4>Bem-vindo!</h4>
+  <h1>Ntalk</h1>
+  <h4>Bem-vindo!</h4>
 </header>
 <section>
-<form action="/entrar" method="post">
-<input type="text" name="nome" placeholder="Seu nome">
-<br>
-<input type="text" name="email" placeholder="Seu e-mail">
-<br>
-<button type="submit">Entrar</button>
-</form>
+  <form action="/entrar" method="post">
+    <input type="text" name="usuario[nome]" placeholder="Digite o nome">
+    <br>
+    <input type="text" name="usuario[email]" placeholder="Digite o e-mail">
+     <br>
+     <button type="submit">Entrar</button>
+  </form>
 </section>
-<footer>
-<small>Ntalk - Agenda de contatos</small>
-</footer>
-</body>
-</html>
+<% include ../footer %>
