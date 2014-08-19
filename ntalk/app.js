@@ -1,45 +1,61 @@
-var express = require('express');
-var app = express();
-var load = require('express-load');
-//var error = require('./middleware/error');  // comentado pois estava sempre caindo na pagina 404
-var cookieParser = require('cookie-parser')
-var session = require('cookie-session')
-var bodyParser = require('body-parser')
-var methodOverride = require('method-override');
-var server = require('http').createServer(app);
-var io = require('socket.io').listen(server);
-
+const KEY  = 'ntalk.sid', SECRET = 'ntalk';
+var express = require('express')
+, load = require('express-load')
+, bodyParser = require('body-parser')
+, cookieParser = require('cookie-parser')
+, expressSession = require('express-session')
+, methodOverride = require('method-override')
+, error = require('./middlewares/error')
+, app = express()
+, server = require('http').Server(app)
+, io = require('socket.io')(server)
+, cookie = cookieParser(SECRET)
+, store = new expressSession.MemoryStore() 
+;
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
-app.use(cookieParser('ntalk'));
-app.use(session({
-  keys: ['usuario']
+app.use(cookie);
+app.use(expressSession({
+ secret: SECRET,
+ name: KEY,
+ resave: true,
+ saveUninitialized: true,
+ store: store
 }));
-app.use(bodyParser());
-app.use(methodOverride('X-HTTP-Method-Override'));
-//app.use(app.router); //deprecetad no more necessary
+app.use(cookieParser('ntalk'));
+app.use(expressSession());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + '/public'));
-//app.use(error.notFound); // comentado pois estava sempre caindo na pagina 404
-//app.use(error.serverError); // comentado pois estava sempre caindo na pagina 404
 
-//app.get('/', routes.index);
-//app.get('/usuarios', routes.user.index);
-
-load('models')
- .then('controllers')
- .then('routes')
- .into(app);
-
-
-io.sockets.on('connection', function(client){
-	client.on('send-server', function(data){
-		var msg = "<b>" + data.nome + ":</b>" + data.msg + "<br>";
-		client.emit('send-client', msg);
-		client.broadcast.emit('send-client', msg); 
-	});
+io.use(function(socket, next) {
+  var data = socket.request;
+  cookie(data, {}, function(err) {
+    var sessionID = data.signedCookies[KEY];
+    store.get(sessionID, function(err, session) {
+      if (err || !session) {
+        return next(new Error('acesso negado'));
+      } else {
+        socket.handshake.session = session;
+        return next();
+      }
+    });
+  });
 });
 
-app.listen(3000, function(){
-    console.log("Ntalk no ar.");
+load('models')
+.then('controllers')
+.then('routes')
+.into(app);
+
+load('sockets')
+.into(io);
+
+// middleware de tratamento erros
+app.use(error.notFound);
+app.use(error.serverError);
+
+server.listen(3000, function(){
+   console.log("Ntalk no ar.");
 });
