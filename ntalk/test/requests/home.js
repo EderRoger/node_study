@@ -1,5 +1,4 @@
 var app = require('../../app');
-var should = require('should');
 var request = require('supertest')(app);
 
 describe('No controller home', function(){
@@ -27,7 +26,7 @@ describe('No controller home', function(){
 	    });
 	});
 
-	it('deve ir para rota / ao fazer POST ao entrar', function(done){
+	it('erro login, deve ir para rota / ao fazer POST ao entrar', function(done){
 		var login = { 
 		  usuario: { nome:'', email: '' } 
 	    };
